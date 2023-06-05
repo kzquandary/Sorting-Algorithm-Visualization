@@ -1,32 +1,11 @@
 package SortingAlgorithm;
-// Author: Nur Faid Prasetyo
-// Referensi: https://www.geeksforgeeks.org/bubble-sort/
-
-/*
-  Implementasi visualisasi algoritma Bubble Sort menggunakan GUI.
-  Bubble Sort adalah algoritma pengurutan sederhana yang bekerja dengan membandingkan pasangan-pasangan
-  elemen bersebelahan dalam array. Jika terdapat pasangan dengan urutan yang salah, maka posisi
-  kedua elemen tersebut ditukar. Proses ini diulang secara berulang sampai seluruh array terurut.
-
-  Langkah-langkah dalam Bubble Sort:
-  1. Bandingkan elemen pertama dengan elemen kedua. Jika urutannya salah, tukar posisi elemen tersebut.
-  2. Lanjutkan dengan membandingkan elemen kedua dengan elemen ketiga, dan seterusnya.
-  3. Setelah mencapai akhir array, kembali ke awal dan ulangi proses untuk setiap elemen.
-  4. Ulangi langkah-langkah di atas hingga tidak ada lagi pasangan elemen yang perlu ditukar.
-
-  Bubble Sort merupakan algoritma yang sederhana namun memiliki kompleksitas waktu rata-rata O(n^2),
-  di mana n adalah jumlah elemen dalam array. Algoritma ini cocok digunakan untuk jumlah elemen yang kecil
-  atau dalam kasus-kasus di mana array hampir terurut secara alami.
-
- */
-
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.Random;
 
-public class BubbleSort extends JFrame {
+public class BogoSort extends JFrame {
 
     private static final int TINGGI_WINDOW = 800;
     private static final int LEBAR_WINDOW = 600;
@@ -37,11 +16,10 @@ public class BubbleSort extends JFrame {
     private final JPanel panel;
     private final JTextField inputField;
     private int[] arr;
-    private int indexAktif;
     private int[] arraySebelumnya;
 
-    public BubbleSort() {
-        setTitle("Bubble Sort");
+    public BogoSort() {
+        setTitle("Bogo Sort");
         setSize(TINGGI_WINDOW, LEBAR_WINDOW);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -54,12 +32,12 @@ public class BubbleSort extends JFrame {
         inputField = new JTextField(20);
         inputPanel.add(inputField);
 
-        inputField.setToolTipText("Masukan Angka (Spasi Untuk Membatasi Angka)");
+        inputField.setToolTipText("Masukkan Angka (Spasi Untuk Membatasi Angka)");
 
         JButton sortButton = new JButton("Sort");
         sortButton.addActionListener(e -> {
             generateRandomArray();
-            draw(arr, -1);
+            draw(arr);
             startSorting();
         });
         inputPanel.add(sortButton);
@@ -67,7 +45,7 @@ public class BubbleSort extends JFrame {
         JButton resetButton = new JButton("Reset");
         resetButton.addActionListener(e -> {
             resetArray();
-            draw(arr, -1);
+            draw(arr);
         });
         inputPanel.add(resetButton);
 
@@ -78,61 +56,48 @@ public class BubbleSort extends JFrame {
     }
 
     public static void main(String[] args) {
-        new BubbleSort();
+        new BogoSort();
     }
 
     private void startSorting() {
-        indexAktif = -1;
+        int attemptCount = 0;
 
-        if (arr != null) {
-            int lastIndex = arr.length - 1;
-            while (lastIndex >= 0 && arr[lastIndex] == 0) {
-                lastIndex--; // Mencari indeks terakhir elemen yang bukan 0
-            }
-            if (lastIndex >= 0) {
-                bubbleSort(); // Mengurutkan elemen yang valid menggunakan Bubble Sort
-            }
+        while (!isSorted(arr)) {
+            shuffleArray(arr);
+            draw(arr);
+            printArray(arr);
+            attemptCount++;
         }
 
         assert arr != null;
-        draw(arr, -1);
+        draw(arr);
 
         if (isSorted(arr)) {
             printArray(arr);
-            System.out.println("Array telah diurutkan.");
+            System.out.println("Array telah diurutkan dengan " + attemptCount + " kali percobaan.");
         } else {
             System.out.println("Array tidak terurut.");
         }
     }
 
+
     private boolean isSorted(int[] arr) {
         for (int i = 1; i < arr.length; i++) {
             if (arr[i] < arr[i - 1]) {
-                return false; // Jika ada elemen yang lebih kecil dari elemen sebelumnya, array tidak terurut
+                return false;
             }
         }
-        return true; // Jika tidak ada elemen yang lebih kecil dari elemen sebelumnya, array terurut
+        return true;
     }
 
-    private void bubbleSort() {
-        int n = arr.length;
-        for (int i = 0; i < n - 1; i++) {
-            for (int j = 0; j < n - i - 1; j++) {
-                if (arr[j] > arr[j + 1]) {
-                    swap(j, j + 1); // Menukar elemen jika elemen saat ini lebih besar dari elemen berikutnya
-                    indexAktif = j; // Mengatur indeks aktif saat ini untuk tujuan visualisasi
-                    draw(arr, indexAktif); // Menggambar array setelah pertukaran elemen
-                    printArray(arr); // Print array setelah melakukan swap element
-                }
-            }
+    private void shuffleArray(int[] arr) {
+        Random rand = new Random();
+        for (int i = arr.length - 1; i > 0; i--) {
+            int j = rand.nextInt(i + 1);
+            int temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
         }
-    }
-
-    private void swap(int i, int j) {
-        int temp = arr[i]; // Menyimpan nilai sementara dari elemen i
-        arr[i] = arr[j]; // Menugaskan nilai elemen j ke elemen i
-        arr[j] = temp; // Menugaskan nilai sementara ke elemen j
-        System.out.println("Perubahan: Angka " + arr[i] + " dipindahkan dari index " + j + " ke index " + i);
     }
 
     private void generateRandomArray() {
@@ -158,22 +123,22 @@ public class BubbleSort extends JFrame {
         }
         System.out.println();
 
-        arraySebelumnya = null; // Reset state array sebelumnya
+        arraySebelumnya = null;
     }
 
     private void printArray(int[] arr) {
-        if (!Arrays.equals(arraySebelumnya, arr)) { // Membandingkan dengan Array Sebelumnya
+        if (!Arrays.equals(arraySebelumnya, arr)) {
             System.out.println("Array Sekarang:");
             for (int i = 0; i < arr.length; i++) {
                 System.out.print(arr[i] + "[" + i + "] ");
             }
             System.out.println();
 
-            arraySebelumnya = arr.clone(); // Menyimpan array sekarang kedalam array sebelumnya
+            arraySebelumnya = arr.clone();
         }
     }
 
-    private void draw(int[] arr, int currentIndex) {
+    private void draw(int[] arr) {
         Graphics g = panel.getGraphics();
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, panel.getWidth(), panel.getHeight());
@@ -182,9 +147,6 @@ public class BubbleSort extends JFrame {
             int x = i * LEBAR_KOTAK;
             int y = panel.getHeight() - (arr[i] * FAKTOR_TINGGI_BATANG);
             int tinggi = arr[i] * FAKTOR_TINGGI_BATANG;
-            if (i == currentIndex) {
-                g.setColor(Color.GREEN);
-            }
             g.fillRect(x, y, LEBAR_KOTAK, tinggi);
             g.setColor(Color.BLUE);
         }
@@ -196,8 +158,9 @@ public class BubbleSort extends JFrame {
     }
 
     private void resetArray() {
-        Arrays.fill(arr, 0); // Mengisi semua elemen array dengan nilai 0
+        Arrays.fill(arr, 0);
         inputField.setText("");
         panel.repaint();
     }
 }
+
